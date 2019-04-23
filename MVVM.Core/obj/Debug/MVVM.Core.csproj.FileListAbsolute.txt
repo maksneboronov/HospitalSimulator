@@ -1,0 +1,6 @@
+C:\Users\Maks\Desktop\HospitalSimulator\MVVM.Core\bin\Debug\MVVM.Core.dll
+C:\Users\Maks\Desktop\HospitalSimulator\MVVM.Core\bin\Debug\MVVM.Core.pdb
+C:\Users\Maks\Desktop\HospitalSimulator\MVVM.Core\obj\Debug\MVVM.Core.csprojAssemblyReference.cache
+C:\Users\Maks\Desktop\HospitalSimulator\MVVM.Core\obj\Debug\MVVM.Core.csproj.CoreCompileInputs.cache
+C:\Users\Maks\Desktop\HospitalSimulator\MVVM.Core\obj\Debug\MVVM.Core.dll
+C:\Users\Maks\Desktop\HospitalSimulator\MVVM.Core\obj\Debug\MVVM.Core.pdb

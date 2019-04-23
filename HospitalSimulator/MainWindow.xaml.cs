@@ -23,6 +23,8 @@ namespace HospitalSimulator
 		public MainWindow()
 		{
 			InitializeComponent();
+
+			this.DataContext = new HospitalViewModel();
 		}
 	}
 }
