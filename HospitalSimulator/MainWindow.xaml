@@ -8,6 +8,6 @@
         Title="HospitalSimulator" Height="450" Width="800">
     <StackPanel>
 		<TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-		<TextBlock Text="{Binding Name}"/>
+		<TextBlock Text="{Binding FullName}"/>
 	</StackPanel>
 </Window>

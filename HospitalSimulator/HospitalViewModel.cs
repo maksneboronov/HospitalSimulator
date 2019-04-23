@@ -9,7 +9,10 @@ namespace HospitalSimulator
 {
     internal sealed class HospitalViewModel : NotifyPropertyChanged
     {
+		[Raisable("FullName")]
 		public string Name { get => _name; set => this.UpdateValue(value, ref _name); }
+
+		public string FullName { get => _name; }
 
 		public HospitalViewModel()
 		{
