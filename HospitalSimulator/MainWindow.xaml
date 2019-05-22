@@ -9,5 +9,6 @@
     <StackPanel>
 		<TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 		<TextBlock Text="{Binding FullName}"/>
+		<Button Content="Очистить" Command="{Binding ClearName}"/>
 	</StackPanel>
 </Window>

@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace MVVM.Core
 {
-	class RelayCommand<T> : ICommand
+	public class RelayCommand<T> : ICommand
 	{
 		public event EventHandler CanExecuteChanged
 		{
