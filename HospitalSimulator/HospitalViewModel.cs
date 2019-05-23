@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace HospitalSimulator
 {
-    internal sealed class HospitalViewModel : NotifyPropertyChanged
+	internal sealed class HospitalViewModel : NotifyPropertyChanged
     {
 		[Raisable("FullName")]
 		public string Name { get => _name; set => this.UpdateValue(value, ref _name); }

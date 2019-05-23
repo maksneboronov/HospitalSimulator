@@ -8,8 +8,8 @@ namespace HospitalSimulator.ViewModels
 {
 	internal class PatientViewModel : PersonViewModel, IPatient
 	{
-		public PatienStatus Status { get => _status; set => this.UpdateValue(value, ref _status); }
+		public PatientStatus Status { get => _status; set => this.UpdateValue(value, ref _status); }
 		
-		private PatienStatus _status;
+		private PatientStatus _status = PatientStatus.Healthy;
 	}
 }

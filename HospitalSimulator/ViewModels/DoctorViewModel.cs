@@ -6,6 +6,6 @@ namespace HospitalSimulator.ViewModels
 	{
 		public DoctorStatus Status { get => _status; set => this.UpdateValue(value, ref _status); }
 
-		private DoctorStatus _status;
+		private DoctorStatus _status = DoctorStatus.NotWork;
 	}
 }

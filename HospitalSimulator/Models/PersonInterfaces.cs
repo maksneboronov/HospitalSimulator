@@ -26,7 +26,7 @@ namespace HospitalSimulator.Models
 		DoctorStatus Status { get; set; }
 	}
 
-	internal enum PatienStatus
+	internal enum PatientStatus
 	{
 		Sick,
 		Healthy
@@ -34,6 +34,6 @@ namespace HospitalSimulator.Models
 
 	internal interface IPatient
 	{
-		PatienStatus Status { get; set; }
+		PatientStatus Status { get; set; }
 	}
 }
