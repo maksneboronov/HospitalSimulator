@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\DoctorStatusConverter.cs" />
     <Compile Include="Converters\IllConverter.cs" />
     <Compile Include="Converters\SexConverter.cs" />
     <Compile Include="Services\Interfaces\IPersonFactory.cs" />
