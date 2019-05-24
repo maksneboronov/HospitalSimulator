@@ -40,16 +40,14 @@ namespace HospitalSimulator.Services
 
 		public PatientViewModel CreateRandomPatient() => new PatientViewModel
 		{
-			Name = $"{_firstNames[_rand.Next(_firstNames.Length)]} {_lastNames[_rand.Next(_lastNames.Length)]}",
-			Sex = _rand.Next(2) == 1 ? PersonSex.Female : PersonSex.Male,
+			Name = $"{_lastNames[_rand.Next(_lastNames.Length)]} {_firstNames[_rand.Next(_firstNames.Length)]}",
 			Status = _rand.Next(10) < 7 ? PatientStatus.Sick : PatientStatus.Healthy
 		};
 
 		public DoctorViewModel CreateRandomDoctor() => new DoctorViewModel
 		{
-			Name = $"{_firstNames[_rand.Next(_firstNames.Length)]} {_lastNames[_rand.Next(_lastNames.Length)]}",
-			Sex = _rand.Next(2) == 1 ? PersonSex.Female : PersonSex.Male,
-			Status = _rand.Next(10) < 7 ? DoctorStatus.Wait : DoctorStatus.NotWork
+			Name = $"{_lastNames[_rand.Next(_lastNames.Length)]} {_firstNames[_rand.Next(_firstNames.Length)]}",
+			Status = DoctorStatus.Wait
 		};
 
 		public ObservableCollection<DoctorViewModel> CreateDoctors(int min = 0, int max = 10) => CreatePersons(min, max, CreateRandomDoctor);
@@ -69,8 +67,8 @@ namespace HospitalSimulator.Services
 			return result;
 		}
 
-		private readonly Random _rand = new Random(DateTime.Now.Millisecond);
-		private readonly String[] _firstNames = new[] { "Peter", "Ivan", "Max", "Stive", "Kate", "Jane" };
-		private readonly String[] _lastNames = new[] { "Parker", "Klein", "Forbes", "Silkens", "Clarkson", "Crag", "Williams" };
+		private readonly Random _rand = new Random(DateTime.Now.GetHashCode());
+		private readonly String[] _firstNames = new[] { "Peter", "Ivan", "Max", "Sane", "Kate", "Jane", "Fill", "Ane", "Adam", "Cristine", "Dan", "Alex", "Sand" };
+		private readonly String[] _lastNames = new[] { "Parker", "Klein", "Forbes", "Silkens", "Clarkson", "Crag", "Williams", "Ronaldo", "Freiser", "Smolling", "Larson" };
 	}
 }

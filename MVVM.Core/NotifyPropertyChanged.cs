@@ -57,9 +57,12 @@ namespace MVVM.Core
 			}
 
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-			foreach(var prop in _propDict[name])
+			if (_propDict.ContainsKey(name))
 			{
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+				foreach (var prop in _propDict[name])
+				{
+					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+				}
 			}
 		}
 

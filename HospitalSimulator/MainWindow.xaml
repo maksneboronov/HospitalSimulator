@@ -4,11 +4,79 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HospitalSimulator"
+		xmlns:viewmodel="clr-namespace:HospitalSimulator.ViewModels"
+		xmlns:model="clr-namespace:HospitalSimulator.Models"
+		xmlns:conv="clr-namespace:HospitalSimulator.Converters"
         mc:Ignorable="d"
-        Title="HospitalSimulator" Height="450" Width="800">
-    <StackPanel>
-		<TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-		<TextBlock Text="{Binding FullName}"/>
-		<Button Content="Очистить" Command="{Binding ClearName}"/>
-	</StackPanel>
+        Title="Симулятор больницы" MinHeight="450" MinWidth="800" Width="800" Height="450" ResizeMode="CanMinimize">
+	<Window.Resources>
+		<conv:SexConverter x:Key="SexConverter" />
+		<conv:IllConverter x:Key="IllConverter" />
+		<conv:DoctorStatusConverter x:Key="DoctorStatusConverter" />
+
+		<Style TargetType="Label">
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+		</Style>
+
+		<Style TargetType="ListBox">
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Height" Value="385" />
+			<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+		</Style>
+
+		<Style TargetType="ListBoxItem">
+			<Setter Property="Margin" Value="10 0" />
+		</Style>
+
+		<DataTemplate x:Key="PatientTemplate" DataType="{x:Type viewmodel:PatientViewModel}">
+			<WrapPanel>
+				<Grid Visibility="{Binding Status, Converter={StaticResource IllConverter}}">
+					<Rectangle Fill="Red" Width="10" Height="4"/>
+					<Rectangle Fill="Red" Width="4" Height="10"/>
+				</Grid>
+				<Ellipse Fill="{Binding Sex, Converter={StaticResource SexConverter}}" Width="10" Height="10" Margin="4 0"/>
+				<TextBlock Text="{Binding Name}"/>
+			</WrapPanel>
+		</DataTemplate>
+
+		<DataTemplate x:Key="DoctorTemplate" DataType="{x:Type viewmodel:DoctorViewModel}">
+			<WrapPanel>
+				<Grid Visibility="{Binding Status, Converter={StaticResource IllConverter}}">
+					<Rectangle Fill="Red" Width="10" Height="4"/>
+					<Rectangle Fill="Red" Width="4" Height="10"/>
+				</Grid>
+				<Ellipse Fill="{Binding Sex, Converter={StaticResource SexConverter}}" Width="10" Height="10" Margin="4 0"/>
+				<TextBlock Text="{Binding Name}"/>
+			</WrapPanel>
+		</DataTemplate>
+
+	</Window.Resources>
+	<Window.Content>
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+
+			<StackPanel Grid.Column="0">
+				<Label Content="Очередь"/>
+				<ListBox ItemsSource="{Binding Patients}" ItemTemplate="{StaticResource PatientTemplate}" />
+			</StackPanel>
+
+			<StackPanel Grid.Column="1">
+				<Label Content="Смотровая"/>
+				<ListBox ItemsSource="{Binding WaitingPatients}" ItemTemplate="{StaticResource PatientTemplate}" />
+			</StackPanel>
+
+			<StackPanel Grid.Column="2">
+				<Label Content="Врачи"/>
+				<ListBox ItemsSource="{Binding Doctors}" ItemTemplate="{StaticResource DoctorTemplate}" />
+			</StackPanel>
+		</Grid>
+	</Window.Content>
 </Window>

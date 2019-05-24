@@ -16,3 +16,4 @@ C:\Users\Maks\Desktop\HospitalSimulator\HospitalSimulator\obj\Debug\HospitalSimu
 C:\Users\Maks\Desktop\HospitalSimulator\HospitalSimulator\obj\Debug\HospitalSimulator.csproj.CopyComplete
 C:\Users\Maks\Desktop\HospitalSimulator\HospitalSimulator\obj\Debug\HospitalSimulator.exe
 C:\Users\Maks\Desktop\HospitalSimulator\HospitalSimulator\obj\Debug\HospitalSimulator.pdb
+C:\Users\Maks\Desktop\HospitalSimulator\HospitalSimulator\obj\Debug\GeneratedInternalTypeHelper.g.cs
