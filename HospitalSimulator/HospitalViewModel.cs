@@ -22,7 +22,7 @@ namespace HospitalSimulator
 
 		public HospitalViewModel()
 		{
-			Doctors = _personFactory.CreateDoctors(_maxDoctotsNum, _maxDoctotsNum);
+			Doctors = _personFactory.CreateDoctors(_maxDoctorsNum, _maxDoctorsNum);
 
 			SynchronizationContext.SetSynchronizationContext(SynchronizationContext.Current);
 
@@ -36,6 +36,9 @@ namespace HospitalSimulator
 
 		}
 
+		// Вариант 1 (действующий): семафорслим, но тогда пациенты заходят в смотровую только при генерации пациента 
+		//		(при большом периоде генерации никто не зайдет, но позже зайдет та группа, которая не заходила, но это не точно)
+		// Вариант 2: убрать семафоры, пусть лучше крутится отдельный поток, который будет проверять, надо ли зайти пациенту, но он будет куртится вечно
 		private async void CreatePatients()
 		{
 			while (true)
@@ -44,8 +47,8 @@ namespace HospitalSimulator
 
 				lock (_sync)
 				{
-					Patients.Add(_personFactory.CreateRandomPatient());
-
+					var newPatient = _personFactory.CreateRandomPatient();
+					Patients.Add(newPatient);
 					if (WaitingPatients.Count < _maxWaitingPatientsNum)
 					{
 						_pat.Release();
@@ -62,10 +65,27 @@ namespace HospitalSimulator
 
 				lock (_sync)
 				{
-					WaitingPatients.Add(Patients[0]);
-					Patients.RemoveAt(0);
+					var patients = new List<PatientViewModel>();
+
+					if (_lookoutState == LookoutState.Nobody)
+					{
+						_lookoutState = Patients[0].Status == PatientStatus.Healthy ? LookoutState.OnlyHealthy : LookoutState.OnlySick;
+						patients = Patients.Where(i => i.Status == Patients[0].Status).ToList();
+					}
+					else
+					{
+						var illState = _lookoutState == LookoutState.OnlyHealthy ? PatientStatus.Healthy : PatientStatus.Sick;
+						patients = Patients.Where(i => i.Status == illState).ToList();
+					}
+					var cnt = patients.Count > _maxWaitingPatientsNum ? _maxWaitingPatientsNum : patients.Count;
+					for (var i = 0; i < cnt; ++i)
+					{
+						WaitingPatients.Add(patients[i]);
+						Patients.Remove(patients[i]);
+					}
+
 				}
-				if (_docs.CurrentCount < _maxDoctotsNum)
+				if (_docs.CurrentCount < _maxDoctorsNum)
 				{
 					_docs.Release();
 				}
@@ -79,18 +99,30 @@ namespace HospitalSimulator
 			{
 				await _docs.WaitAsync();
 				WaitingPatients.RemoveAt(0);
+				if (WaitingPatients.Count == 0)
+				{
+					_lookoutState = LookoutState.Nobody;
+				}
 				await Task.Delay(_rand.Next(10000, 20000));
 			}
 		}
 
-		private int _maxDoctotsNum = 5;
+		private int _maxDoctorsNum = 5;
 		private int _maxWaitingPatientsNum = 10;
 
 		private SemaphoreSlim _docs;
-		private SemaphoreSlim _pat = new SemaphoreSlim(0, 1);
+		private SemaphoreSlim _pat = new SemaphoreSlim(0, 1); // _maxWaitingPatients
 		private object _sync = new object();
+		private LookoutState _lookoutState = LookoutState.Nobody;
 
 		private Random _rand = new Random();
 		private readonly IPersonFactory _personFactory = new PersonFactory();
+
+		private enum LookoutState
+		{
+			OnlySick,
+			OnlyHealthy,
+			Nobody
+		}
 	}
 }
