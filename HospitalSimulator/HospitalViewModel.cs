@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using HospitalSimulator.Services.Interfaces;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace HospitalSimulator
 {
@@ -34,6 +35,62 @@ namespace HospitalSimulator
 			Task.Factory.StartNew(CreatePatients, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
 			Task.Factory.StartNew(PatientsToWaiting, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
 
+			_illTimer = new DispatcherTimer()
+			{
+				Interval = TimeSpan.FromSeconds(1),
+				IsEnabled = true
+			};
+
+			_illTimer.Tick += (o, e) => PatientsIll();
+			_illTimer.Start();
+		}
+
+		private void PatientsIll()
+		{
+			if (Patients.Count == 0)
+			{
+				return;
+			}
+
+			if (Patients.All(i => i.Status == PatientStatus.Sick))
+			{
+				lock (_sync)
+				{
+					if (Patients.All(i => i.Status == PatientStatus.Sick))
+					{
+						var keysP = _infection.Keys.ToList();
+						foreach (var k in keysP)
+						{
+							_infection[k] = 0;
+						}
+						return;
+					}
+				}
+			}
+
+			var keys = _infection.Keys.ToList();
+			foreach (var inf in keys)
+			{
+				_infection[inf]++;
+
+				if (_infection[inf] == 5)
+				{
+					lock (_sync)
+					{
+						var keysP = _infection.Keys.ToList();
+						foreach (var k in keysP)
+						{
+							_infection[k] = 0;
+						}
+
+						foreach (var p in Patients)
+						{
+							p.Status = PatientStatus.Sick;
+						}
+					}
+					break;
+				}
+			}
 		}
 
 		// Вариант 1 (действующий): семафорслим, но тогда пациенты заходят в смотровую только при генерации пациента 
@@ -43,12 +100,16 @@ namespace HospitalSimulator
 		{
 			while (true)
 			{
-				await Task.Delay(_rand.Next(1000, 2000));
+				await Task.Delay(_rand.Next(100, 1100));
 
 				lock (_sync)
 				{
 					var newPatient = _personFactory.CreateRandomPatient();
 					Patients.Add(newPatient);
+					if (newPatient.Status == PatientStatus.Sick)
+					{
+						_infection[newPatient] = 0;
+					}
 					if (WaitingPatients.Count < _maxWaitingPatientsNum)
 					{
 						_pat.Release();
@@ -82,6 +143,7 @@ namespace HospitalSimulator
 					{
 						WaitingPatients.Add(patients[i]);
 						Patients.Remove(patients[i]);
+						_infection.Remove(patients[i]);
 					}
 
 				}
@@ -103,17 +165,21 @@ namespace HospitalSimulator
 				{
 					_lookoutState = LookoutState.Nobody;
 				}
-				await Task.Delay(_rand.Next(10000, 20000));
+				await Task.Delay(_rand.Next(15000, 20000));
 			}
 		}
 
 		private int _maxDoctorsNum = 5;
 		private int _maxWaitingPatientsNum = 10;
 
+		private Dictionary<IPatient, int> _infection = new Dictionary<IPatient, int>();
+
 		private SemaphoreSlim _docs;
 		private SemaphoreSlim _pat = new SemaphoreSlim(0, 1); // _maxWaitingPatients
 		private object _sync = new object();
 		private LookoutState _lookoutState = LookoutState.Nobody;
+
+		private DispatcherTimer _illTimer;
 
 		private Random _rand = new Random();
 		private readonly IPersonFactory _personFactory = new PersonFactory();
