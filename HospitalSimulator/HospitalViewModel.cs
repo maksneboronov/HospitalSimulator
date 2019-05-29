@@ -15,6 +15,11 @@ using System.Windows.Threading;
 
 namespace HospitalSimulator
 {
+	//TODO:
+	// Доктор может уйти на помощь другому доктору
+	// Диалоговое окно выбора параметров
+	// Кнопки паузы
+
 	internal sealed class HospitalViewModel : NotifyPropertyChanged
 	{
 		public ObservableCollection<PatientViewModel> Patients { get; set; } = new ObservableCollection<PatientViewModel>();
@@ -160,12 +165,21 @@ namespace HospitalSimulator
 			while (true)
 			{
 				await _docs.WaitAsync();
+				doc.Status = DoctorStatus.Work;
 				WaitingPatients.RemoveAt(0);
 				if (WaitingPatients.Count == 0)
 				{
 					_lookoutState = LookoutState.Nobody;
 				}
 				await Task.Delay(_rand.Next(15000, 20000));
+
+				if (_rand.Next(0, 10) < 3)
+				{
+					doc.Status = DoctorStatus.NotWork;
+					await Task.Delay(_rand.Next(15000, 20000));
+				}
+				doc.Status = DoctorStatus.Wait;
+				await Task.Delay(100);
 			}
 		}
 

@@ -41,10 +41,7 @@
 
 		<DataTemplate x:Key="DoctorTemplate" DataType="{x:Type viewmodel:DoctorViewModel}">
 			<WrapPanel>
-				<Grid Visibility="{Binding Status, Converter={StaticResource IllConverter}}">
-					<Rectangle Fill="Red" Width="10" Height="4"/>
-					<Rectangle Fill="Red" Width="4" Height="10"/>
-				</Grid>
+				<Ellipse Fill="{Binding Status, Converter={StaticResource DoctorStatusConverter}}" Width="10" Height="10" Margin="4 0" />
 				<Ellipse Fill="{Binding Sex, Converter={StaticResource SexConverter}}" Width="10" Height="10" Margin="4 0"/>
 				<TextBlock Text="{Binding Name}"/>
 			</WrapPanel>
