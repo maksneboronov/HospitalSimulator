@@ -139,6 +139,7 @@ namespace HospitalSimulator
 						patients = Patients.Where(i => i.Status == illState).ToList();
 					}
 					var cnt = patients.Count > _maxWaitingPatientsNum ? _maxWaitingPatientsNum : patients.Count;
+					cnt = cnt > _maxWaitingPatientsNum - WaitingPatients.Count ? _maxWaitingPatientsNum - WaitingPatients.Count : cnt;
 					for (var i = 0; i < cnt; ++i)
 					{
 						WaitingPatients.Add(patients[i]);
