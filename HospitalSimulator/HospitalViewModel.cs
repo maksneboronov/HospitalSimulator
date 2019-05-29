@@ -11,10 +11,10 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using HospitalSimulator.Services.Interfaces;
 using System.Threading;
-using System.Windows.Threading;
 
 namespace HospitalSimulator
 {
+
 	internal sealed class HospitalViewModel : NotifyPropertyChanged
 	{
 		public ObservableCollection<PatientViewModel> Patients { get; set; } = new ObservableCollection<PatientViewModel>();
@@ -35,13 +35,7 @@ namespace HospitalSimulator
 			Task.Factory.StartNew(CreatePatients, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
 			Task.Factory.StartNew(PatientsToWaiting, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
 
-			_illTimer = new DispatcherTimer()
-			{
-				Interval = TimeSpan.FromSeconds(1),
-				IsEnabled = true
-			};
-
-			_illTimer.Tick += (o, e) => PatientsIll();
+			_illTimer = new TimerWrapper(TimeSpan.FromSeconds(5), PatientsIll);
 			_illTimer.Start();
 		}
 
@@ -49,6 +43,7 @@ namespace HospitalSimulator
 		{
 			if (Patients.Count == 0)
 			{
+				_illTimer.Stop();
 				return;
 			}
 
@@ -100,7 +95,7 @@ namespace HospitalSimulator
 		{
 			while (true)
 			{
-				await Task.Delay(_rand.Next(100, 1100));
+				await Task.Delay(_rand.NextRandomSecond(2, 3));
 
 				lock (_sync)
 				{
@@ -114,6 +109,7 @@ namespace HospitalSimulator
 					{
 						_pat.Release();
 					}
+					_illTimer.Start();
 				}
 			}
 		}
@@ -167,12 +163,12 @@ namespace HospitalSimulator
 				{
 					_lookoutState = LookoutState.Nobody;
 				}
-				await Task.Delay(_rand.Next(15000, 20000));
+				await Task.Delay(_rand.NextRandomSecond(15, 20));
 
-				if (_rand.Next(0, 10) < 3)
+				if (_rand.Next(10) < 3)
 				{
 					doc.Status = DoctorStatus.NotWork;
-					await Task.Delay(_rand.Next(15000, 20000));
+					await Task.Delay(_rand.NextRandomSecond(15, 20));
 				}
 
 				doc.Status = DoctorStatus.Wait;
@@ -190,9 +186,8 @@ namespace HospitalSimulator
 		private object _sync = new object();
 		private LookoutState _lookoutState = LookoutState.Nobody;
 
-		private DispatcherTimer _illTimer;
-
-		private Random _rand = new Random();
+		private ITimerWrapper _illTimer;
+		private RandomTimeService _rand = new RandomTimeService();
 		private readonly IPersonFactory _personFactory = new PersonFactory();
 
 		private enum LookoutState
