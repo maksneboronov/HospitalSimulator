@@ -22,20 +22,9 @@ namespace HospitalSimulator
 
 		public HospitalViewModel()
 		{
-			_uiserv.OpenOptionWindow(ref _maxDoctorsNum, ref _maxWaitingPatientsNum, ref _infectionInterval, ref _generationInterval, ref _receptionInterval);
-
-			Doctors = _personFactory.CreateDoctors(_maxDoctorsNum, _maxDoctorsNum);
-
-			_docs = new SemaphoreSlim(0, _maxWaitingPatientsNum);
-			foreach (var doc in Doctors)
-			{
-				var t = Task.Factory.StartNew(DoctorsWorking, doc, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
-			}
-			Task.Factory.StartNew(CreatePatients, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
-			Task.Factory.StartNew(PatientsToWaiting, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+			//_uiserv.OpenOptionWindow(ref _maxDoctorsNum, ref _maxWaitingPatientsNum, ref _infectionInterval, ref _generationInterval, ref _receptionInterval);
 
 			_illTimer = new TimerWrapper(TimeSpan.FromSeconds(1), PatientsIll);
-			_illTimer.Start();
 		}
 
 		private void PatientsIll()
@@ -175,6 +164,34 @@ namespace HospitalSimulator
 			}
 		}
 
+		private void Start()
+		{
+			Doctors = _personFactory.CreateDoctors(_maxDoctorsNum, _maxDoctorsNum);
+
+			_docs = new SemaphoreSlim(0, _maxWaitingPatientsNum);
+			foreach (var doc in Doctors)
+			{
+				var t = Task.Factory.StartNew(DoctorsWorking, doc, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+			}
+			Task.Factory.StartNew(CreatePatients, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+			Task.Factory.StartNew(PatientsToWaiting, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+
+			_illTimer.Start();
+		}
+
+		// TODO: попробовать использовать ContinueWith
+		private void Stop()
+		{
+
+		}
+
+		// TODO: Использовать CancellationTokenSource для остановки - исключания, проверки. Скорректрировать Start для продолжения после паузы, а не полного сброса.
+		private void Pause()
+		{
+			
+			//_illTimer.Stop();
+		}
+
 		private int _maxDoctorsNum = 11;
 		private int _maxWaitingPatientsNum = 11;
 		private int _infectionInterval = 11;
@@ -187,6 +204,7 @@ namespace HospitalSimulator
 		private SemaphoreSlim _pat = new SemaphoreSlim(0, 1);
 		private object _sync = new object();
 		private LookoutState _lookoutState = LookoutState.Nobody;
+		private CancellationTokenSource _cts;
 
 		private IUIService _uiserv = new UIService();
 		private ITimerWrapper _illTimer;
