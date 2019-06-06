@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +10,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using HospitalSimulator.Services.Interfaces;
 using System.Threading;
+using System;
 
 namespace HospitalSimulator
 {
@@ -22,9 +22,9 @@ namespace HospitalSimulator
 
 		public HospitalViewModel()
 		{
-			Doctors = _personFactory.CreateDoctors(_maxDoctorsNum, _maxDoctorsNum);
+			_uiserv.OpenOptionWindow(ref _maxDoctorsNum, ref _maxWaitingPatientsNum, ref _infectionInterval, ref _generationInterval, ref _receptionInterval);
 
-			//SynchronizationContext.SetSynchronizationContext(SynchronizationContext.Current);
+			Doctors = _personFactory.CreateDoctors(_maxDoctorsNum, _maxDoctorsNum);
 
 			_docs = new SemaphoreSlim(0, _maxWaitingPatientsNum);
 			foreach (var doc in Doctors)
@@ -34,7 +34,7 @@ namespace HospitalSimulator
 			Task.Factory.StartNew(CreatePatients, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
 			Task.Factory.StartNew(PatientsToWaiting, new CancellationToken(false), TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
 
-			_illTimer = new TimerWrapper(TimeSpan.FromSeconds(5), PatientsIll);
+			_illTimer = new TimerWrapper(TimeSpan.FromSeconds(1), PatientsIll);
 			_illTimer.Start();
 		}
 
@@ -67,7 +67,7 @@ namespace HospitalSimulator
 			{
 				_infection[inf]++;
 
-				if (_infection[inf] == 5)
+				if (_infection[inf] == _infectionInterval)
 				{
 					lock (_sync)
 					{
@@ -94,7 +94,7 @@ namespace HospitalSimulator
 		{
 			while (true)
 			{
-				await Task.Delay(_rand.NextRandomSecond(2, 3));
+				await Task.Delay(_rand.NextRandomSecond(1, _generationInterval));
 
 				lock (_sync)
 				{
@@ -162,12 +162,12 @@ namespace HospitalSimulator
 				{
 					_lookoutState = LookoutState.Nobody;
 				}
-				await Task.Delay(_rand.NextRandomSecond(15, 20));
+				await Task.Delay(_rand.NextRandomSecond(1, _receptionInterval));
 
 				if (_rand.Next(10) < 3)
 				{
 					doc.Status = DoctorStatus.NotWork;
-					await Task.Delay(_rand.NextRandomSecond(15, 20));
+					await Task.Delay(_rand.NextRandomSecond(1, _receptionInterval));
 				}
 
 				doc.Status = DoctorStatus.Wait;
@@ -175,8 +175,11 @@ namespace HospitalSimulator
 			}
 		}
 
-		private int _maxDoctorsNum = 5;
-		private int _maxWaitingPatientsNum = 10;
+		private int _maxDoctorsNum = 11;
+		private int _maxWaitingPatientsNum = 11;
+		private int _infectionInterval = 11;
+		private int _receptionInterval = 11;
+		private int _generationInterval = 11;
 
 		private Dictionary<IPatient, int> _infection = new Dictionary<IPatient, int>();
 
@@ -185,6 +188,7 @@ namespace HospitalSimulator
 		private object _sync = new object();
 		private LookoutState _lookoutState = LookoutState.Nobody;
 
+		private IUIService _uiserv = new UIService();
 		private ITimerWrapper _illTimer;
 		private RandomTimeService _rand = new RandomTimeService();
 		private readonly IPersonFactory _personFactory = new PersonFactory();

@@ -5,15 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HospitalSimulator"
         mc:Ignorable="d"
-        Title="Options" Height="310" Width="380" ResizeMode="NoResize">
+        Title="Options" Height="310" Width="390" ResizeMode="NoResize">
 	<Window.Resources>
 		<Style TargetType="WrapPanel">
 			<Setter Property="HorizontalAlignment" Value="Right"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
 		</Style>
 
+		<Style TargetType="Label">
+			<Setter Property="MinWidth" Value="25"/>
+		</Style>
+
 		<Style TargetType="Slider">
 			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="IsSnapToTickEnabled" Value="True" />
 		</Style>
 
 		<Style TargetType="Button">
@@ -73,8 +78,8 @@
 			</Grid>
 
 			<WrapPanel Grid.Row="1" Margin="10" HorizontalAlignment="Center">
-				<Button Content="Сохранить"/>
-				<Button Content="Отменить"/>
+				<Button Content="Сохранить" Click="SaveClick"/>
+				<Button Content="Отменить" Click="CancelClick"/>
 			</WrapPanel>
 		</Grid>
 	</Window.Content>
