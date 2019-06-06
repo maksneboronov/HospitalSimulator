@@ -14,7 +14,6 @@ using System.Threading;
 
 namespace HospitalSimulator
 {
-
 	internal sealed class HospitalViewModel : NotifyPropertyChanged
 	{
 		public ObservableCollection<PatientViewModel> Patients { get; set; } = new ObservableCollection<PatientViewModel>();
@@ -25,7 +24,7 @@ namespace HospitalSimulator
 		{
 			Doctors = _personFactory.CreateDoctors(_maxDoctorsNum, _maxDoctorsNum);
 
-			SynchronizationContext.SetSynchronizationContext(SynchronizationContext.Current);
+			//SynchronizationContext.SetSynchronizationContext(SynchronizationContext.Current);
 
 			_docs = new SemaphoreSlim(0, _maxWaitingPatientsNum);
 			foreach (var doc in Doctors)
@@ -182,7 +181,7 @@ namespace HospitalSimulator
 		private Dictionary<IPatient, int> _infection = new Dictionary<IPatient, int>();
 
 		private SemaphoreSlim _docs;
-		private SemaphoreSlim _pat = new SemaphoreSlim(0, 1); // _maxWaitingPatients
+		private SemaphoreSlim _pat = new SemaphoreSlim(0, 1);
 		private object _sync = new object();
 		private LookoutState _lookoutState = LookoutState.Nobody;
 

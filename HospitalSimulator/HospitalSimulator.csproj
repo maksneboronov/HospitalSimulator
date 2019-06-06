@@ -58,8 +58,11 @@
     <Compile Include="Converters\DoctorStatusConverter.cs" />
     <Compile Include="Converters\IllConverter.cs" />
     <Compile Include="Converters\SexConverter.cs" />
+    <Compile Include="Services\RandomTimeService.cs" />
+    <Compile Include="Services\Interfaces\ITimerWrapper.cs" />
     <Compile Include="Services\Interfaces\IPersonFactory.cs" />
     <Compile Include="Services\PersonFactory.cs" />
+    <Compile Include="Services\TimerWrapper.cs" />
     <Compile Include="ViewModels\DoctorViewModel.cs" />
     <Compile Include="ViewModels\PatientViewModel.cs" />
     <Compile Include="ViewModels\PersonViewModel.cs" />
