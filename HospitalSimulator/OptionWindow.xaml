@@ -78,8 +78,8 @@
 			</Grid>
 
 			<WrapPanel Grid.Row="1" Margin="10" HorizontalAlignment="Center">
-				<Button Content="Сохранить" Click="SaveClick"/>
-				<Button Content="Отменить" Click="CancelClick"/>
+				<Button Content="Save" Click="SaveClick"/>
+				<Button Content="Cancel" Click="CancelClick"/>
 			</WrapPanel>
 		</Grid>
 	</Window.Content>

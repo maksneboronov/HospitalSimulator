@@ -77,8 +77,10 @@
 			</StackPanel>
 
 			<WrapPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
+				<Button Content="Start" Width="100" Command="{Binding StartCommand}"/>
 				<Button Content="Resume" Width="100" Command="{Binding ResumeCommand}"/>
 				<Button Content="Pause" Width="100" Command="{Binding PauseCommand}"/>
+				<Button Content="Stop" Width="100" Command="{Binding StopCommand}"/>
 			</WrapPanel>
 		</Grid>
 	</Window.Content>

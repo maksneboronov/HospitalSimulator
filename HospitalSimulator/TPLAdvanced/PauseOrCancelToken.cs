@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Threading;
+using System;
 
 namespace HospitalSimulator.TPLAdvanced
 {
@@ -24,10 +25,18 @@ namespace HospitalSimulator.TPLAdvanced
 			_ct.ThrowIfCancellationRequested();
 		}
 
-		public async Task PauseOrCancelIfRequest()
+		public async Task<bool> PauseOrCancelIfRequest()
 		{
 			await _pt.WaitWhilePausedAsync();
-			_ct.ThrowIfCancellationRequested();
+			try
+			{
+				_ct.ThrowIfCancellationRequested();
+			}
+			catch (OperationCanceledException)
+			{
+				return true;
+			}
+			return false;
 		}
 
 		private CancellationToken _ct;

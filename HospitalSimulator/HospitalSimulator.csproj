@@ -58,6 +58,10 @@
     <Compile Include="Converters\DoctorStatusConverter.cs" />
     <Compile Include="Converters\IllConverter.cs" />
     <Compile Include="Converters\SexConverter.cs" />
+    <Compile Include="TPLAdvanced\PauseOrCancelToken.cs" />
+    <Compile Include="TPLAdvanced\PauseToken.cs" />
+    <Compile Include="TPLAdvanced\PauseTokenSource.cs" />
+    <Compile Include="TPLAdvanced\PCTokenSource.cs" />
     <Compile Include="Services\Interfaces\IUIService.cs" />
     <Compile Include="OptionWindow.xaml.cs">
       <DependentUpon>OptionWindow.xaml</DependentUpon>

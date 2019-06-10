@@ -23,6 +23,8 @@ namespace HospitalSimulator
 
 		public ICommand PauseCommand { get; }
 		public ICommand ResumeCommand { get; }
+		public ICommand StopCommand { get; }
+		public ICommand StartCommand { get; }
 
 		public HospitalViewModel()
 		{
@@ -31,6 +33,8 @@ namespace HospitalSimulator
 			var cf = new RelayCommandFactory();
 			PauseCommand = cf.CreateCommand(Pause);
 			ResumeCommand = cf.CreateCommand(Resume);
+			StartCommand = cf.CreateCommand(Start);
+			StopCommand = cf.CreateCommand(Stop);
 
 			_illTimer = new TimerWrapper(TimeSpan.FromSeconds(1), PatientsIll);
 
@@ -94,9 +98,15 @@ namespace HospitalSimulator
 		{
 			while (true)
 			{
-				await pt.PauseOrCancelIfRequest();
+				if (await pt.PauseOrCancelIfRequest())
+				{
+					return;
+				}
 				await Task.Delay(_rand.NextRandomSecond(1, _generationInterval));
-				await pt.PauseOrCancelIfRequest();
+				if (await pt.PauseOrCancelIfRequest())
+				{
+					return;
+				}
 
 				lock (_sync)
 				{
@@ -119,9 +129,15 @@ namespace HospitalSimulator
 		{
 			while (true)
 			{
-				await pt.PauseOrCancelIfRequest();
+				if (await pt.PauseOrCancelIfRequest())
+				{
+					return;
+				}
 				await _pat.WaitAsync();
-				await pt.PauseOrCancelIfRequest();
+				if (await pt.PauseOrCancelIfRequest())
+				{
+					return;
+				}
 
 				lock (_sync)
 				{
@@ -158,9 +174,15 @@ namespace HospitalSimulator
 		{
 			while (true)
 			{
-				await pt.PauseOrCancelIfRequest();
+				if (await pt.PauseOrCancelIfRequest())
+				{
+					return;
+				}
 				await _docs.WaitAsync();
-				await pt.PauseOrCancelIfRequest();
+				if (await pt.PauseOrCancelIfRequest())
+				{
+					return;
+				}
 
 				doc.Status = DoctorStatus.Work;
 				WaitingPatients.RemoveAt(0);
@@ -169,17 +191,25 @@ namespace HospitalSimulator
 					_lookoutState = LookoutState.Nobody;
 				}
 
-				await pt.PauseOrCancelIfRequest();
+				if (await pt.PauseOrCancelIfRequest())
+				{
+					return;
+				}
 				await Task.Delay(_rand.NextRandomSecond(1, _receptionInterval));
-				await pt.PauseOrCancelIfRequest();
+				if (await pt.PauseOrCancelIfRequest())
+				{
+					return;
+				}
 
 				if (_rand.Next(10) < 3)
 				{
 					doc.Status = DoctorStatus.NotWork;
 
-					await pt.PauseOrCancelIfRequest();
+					if (await pt.PauseOrCancelIfRequest())
+					{
+						return;
+					}
 					await Task.Delay(_rand.NextRandomSecond(1, _receptionInterval));
-					await pt.PauseOrCancelIfRequest();
 				}
 
 				doc.Status = DoctorStatus.Wait;
@@ -189,9 +219,18 @@ namespace HospitalSimulator
 
 		private void Start()
 		{
+			if (_workState != WorkState.Stopped)
+			{
+				return;
+			}
+
+			_pcts = new PCTokenSource();
+			_workState = WorkState.Started;
 			Doctors = _personFactory.CreateDoctors(_maxDoctorsNum, _maxDoctorsNum);
+			this.RaisePropertyChanged(nameof(Doctors));
 
 			_docs = new SemaphoreSlim(0, _maxWaitingPatientsNum);
+			_pat = new SemaphoreSlim(0, 1);
 			foreach (var doc in Doctors)
 			{
 				var t = Task.Factory.StartNew(() => DoctorsWorking(doc, _pcts.Token), _pcts.CancellationToken, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
@@ -204,18 +243,42 @@ namespace HospitalSimulator
 
 		private void Resume()
 		{
+			if (_workState != WorkState.Paused)
+			{
+				return;
+			}
+
+			_workState = WorkState.Started;
 			_pcts.Resume();
 			_illTimer.Start();
 		}
 
 		private void Stop()
 		{
-			//_pcts.Cancel();
-			//_illTimer.Stop();
+			if (_workState != WorkState.Started)
+			{
+				return;
+			}
+			_workState = WorkState.Stopped;
+			_pcts.Cancel();
+			_illTimer.Stop();
+
+			Doctors.Clear();
+			WaitingPatients.Clear();
+			Patients.Clear();
+			_lookoutState = LookoutState.Nobody;
+			_infection.Clear();
+	
 		}
 
 		private void Pause()
 		{
+			if (_workState != WorkState.Started)
+			{
+				return;
+			}
+
+			_workState = WorkState.Paused;
 			_pcts.Pause();
 			_illTimer.Stop();
 		}
@@ -229,10 +292,11 @@ namespace HospitalSimulator
 		private Dictionary<IPatient, int> _infection = new Dictionary<IPatient, int>();
 
 		private SemaphoreSlim _docs;
-		private SemaphoreSlim _pat = new SemaphoreSlim(0, 1);
+		private SemaphoreSlim _pat;
 		private object _sync = new object();
 		private LookoutState _lookoutState = LookoutState.Nobody;
-		private PCTokenSource _pcts = new PCTokenSource();
+		private WorkState _workState = WorkState.Stopped;
+		private PCTokenSource _pcts;
 
 		private IUIService _uiserv = new UIService();
 		private ITimerWrapper _illTimer;
@@ -244,6 +308,13 @@ namespace HospitalSimulator
 			OnlySick,
 			OnlyHealthy,
 			Nobody
+		}
+
+		private enum WorkState
+		{
+			Started,
+			Stopped,
+			Paused
 		}
 	}
 }
