@@ -58,6 +58,7 @@
 
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
 
 			<StackPanel Grid.Column="0">
@@ -74,6 +75,11 @@
 				<Label Content="Врачи"/>
 				<ListBox ItemsSource="{Binding Doctors}" ItemTemplate="{StaticResource DoctorTemplate}" />
 			</StackPanel>
+
+			<WrapPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
+				<Button Content="Resume" Width="100" Command="{Binding ResumeCommand}"/>
+				<Button Content="Pause" Width="100" Command="{Binding PauseCommand}"/>
+			</WrapPanel>
 		</Grid>
 	</Window.Content>
 </Window>
