@@ -47,13 +47,68 @@
 			</WrapPanel>
 		</DataTemplate>
 
+		<DataTemplate x:Key="AdvancedButton" DataType="{x:Type Border}">
+			<Border>
+				<Label Content="Tap"/>
+			</Border>
+		</DataTemplate>
+
+		<Style x:Key="ButtonFocusVisual">
+			<Setter Property="Control.Template">
+				<Setter.Value>
+					<ControlTemplate>
+						<!-- Описать красивый шаблон при фокусе кнопки -->
+						<Rectangle Margin="2" SnapsToDevicePixels="True" Stroke="Red" StrokeDashArray="1 2"/>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style TargetType="{x:Type Button}">
+			<Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Button}">
+						<StackPanel Background="{TemplateBinding Background}">
+							<TextBlock Text="{TemplateBinding Content}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+							<StackPanel.Triggers>
+								<EventTrigger RoutedEvent="MouseEnter">
+									<BeginStoryboard>
+										<Storyboard>
+											<ColorAnimation From="{TemplateBinding Background}"  To="Yellow" Duration="0:0:0.2" Storyboard.TargetProperty="Background.Color"/>
+										</Storyboard>
+									</BeginStoryboard>
+								</EventTrigger>
+
+								<EventTrigger RoutedEvent="MouseLeave">
+									<BeginStoryboard>
+										<Storyboard>
+											<ColorAnimation To="{TemplateBinding Background}"  From="Yellow" Duration="0:0:0.2" Storyboard.TargetProperty="Background.Color"/>
+										</Storyboard>
+									</BeginStoryboard>
+								</EventTrigger>
+							</StackPanel.Triggers>
+						</StackPanel>
+
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter Property="Opacity" Value="0.5" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+
+		</Style>
 	</Window.Resources>
 	<Window.Content>
 		<Grid>
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="265*"/>
+				<ColumnDefinition Width="72*"/>
+				<ColumnDefinition Width="192*"/>
+				<ColumnDefinition Width="265*"/>
 			</Grid.ColumnDefinitions>
 
 			<Grid.RowDefinitions>
@@ -61,26 +116,31 @@
 				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
 
-			<StackPanel Grid.Column="0">
+			<StackPanel Grid.Column="0" Margin="0,0,0,70" Grid.RowSpan="2">
 				<Label Content="Очередь"/>
 				<ListBox ItemsSource="{Binding Patients}" ItemTemplate="{StaticResource PatientTemplate}" />
 			</StackPanel>
 
-			<StackPanel Grid.Column="1">
+			<StackPanel Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,70" Grid.RowSpan="2">
 				<Label Content="Смотровая"/>
 				<ListBox ItemsSource="{Binding WaitingPatients}" ItemTemplate="{StaticResource PatientTemplate}" />
 			</StackPanel>
 
-			<StackPanel Grid.Column="2">
+			<StackPanel Grid.Column="3" Margin="0,0,0,70" Grid.RowSpan="2">
 				<Label Content="Врачи"/>
 				<ListBox ItemsSource="{Binding Doctors}" ItemTemplate="{StaticResource DoctorTemplate}" />
 			</StackPanel>
 
-			<WrapPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
+			<WrapPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Grid.ColumnSpan="2" Margin="32,60,32,0">
 				<Button Content="Start" Width="100" Command="{Binding StartCommand}"/>
 				<Button Content="Resume" Width="100" Command="{Binding ResumeCommand}"/>
 				<Button Content="Pause" Width="100" Command="{Binding PauseCommand}"/>
 				<Button Content="Stop" Width="100" Command="{Binding StopCommand}"/>
+				<Button Content="Op" Width="100" Command="{Binding OptionCommand}"/>
+
+				<Button Content="White" Background="Red"/>
+
+
 			</WrapPanel>
 		</Grid>
 	</Window.Content>

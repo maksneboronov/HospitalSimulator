@@ -25,20 +25,22 @@ namespace HospitalSimulator
 		public ICommand ResumeCommand { get; }
 		public ICommand StopCommand { get; }
 		public ICommand StartCommand { get; }
+		public ICommand OptionCommand { get; }
 
 		public HospitalViewModel()
 		{
-			_uiserv.OpenOptionWindow(ref _maxDoctorsNum, ref _maxWaitingPatientsNum, ref _infectionInterval, ref _generationInterval, ref _receptionInterval);
-			
 			var cf = new RelayCommandFactory();
 			PauseCommand = cf.CreateCommand(Pause);
 			ResumeCommand = cf.CreateCommand(Resume);
 			StartCommand = cf.CreateCommand(Start);
 			StopCommand = cf.CreateCommand(Stop);
+			OptionCommand = cf.CreateCommand(OptionWindowOpen);
+
+			//OptionCommand.Execute(null);
 
 			_illTimer = new TimerWrapper(TimeSpan.FromSeconds(1), PatientsIll);
 
-			Start();
+			//Start();
 
 		}
 
@@ -185,8 +187,11 @@ namespace HospitalSimulator
 				}
 
 				doc.Status = DoctorStatus.Work;
-				WaitingPatients.RemoveAt(0);
-				if (WaitingPatients.Count == 0)
+				if (WaitingPatients.Count > 0)
+				{
+					WaitingPatients.RemoveAt(0);
+				}
+				else
 				{
 					_lookoutState = LookoutState.Nobody;
 				}
@@ -215,6 +220,11 @@ namespace HospitalSimulator
 				doc.Status = DoctorStatus.Wait;
 				await Task.Delay(100);
 			}
+		}
+
+		private void OptionWindowOpen()
+		{
+			_uiserv.OpenOptionWindow(ref _maxDoctorsNum, ref _maxWaitingPatientsNum, ref _infectionInterval, ref _generationInterval, ref _receptionInterval);
 		}
 
 		private void Start()
