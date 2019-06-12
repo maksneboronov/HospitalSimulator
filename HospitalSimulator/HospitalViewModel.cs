@@ -27,6 +27,8 @@ namespace HospitalSimulator
 		public ICommand StartCommand { get; }
 		public ICommand OptionCommand { get; }
 
+		public WorkState WorkStatus { get => _workState; set => this.UpdateValue(value, ref _workState); }
+
 		public HospitalViewModel()
 		{
 			var cf = new RelayCommandFactory();
@@ -229,13 +231,13 @@ namespace HospitalSimulator
 
 		private void Start()
 		{
-			if (_workState != WorkState.Stopped)
+			if (WorkStatus != WorkState.Stopped)
 			{
 				return;
 			}
 
 			_pcts = new PCTokenSource();
-			_workState = WorkState.Started;
+			WorkStatus = WorkState.Started;
 			Doctors = _personFactory.CreateDoctors(_maxDoctorsNum, _maxDoctorsNum);
 			this.RaisePropertyChanged(nameof(Doctors));
 
@@ -253,23 +255,23 @@ namespace HospitalSimulator
 
 		private void Resume()
 		{
-			if (_workState != WorkState.Paused)
+			if (WorkStatus != WorkState.Paused)
 			{
 				return;
 			}
 
-			_workState = WorkState.Started;
+			WorkStatus = WorkState.Started;
 			_pcts.Resume();
 			_illTimer.Start();
 		}
 
 		private void Stop()
 		{
-			if (_workState != WorkState.Started)
+			if (WorkStatus != WorkState.Started)
 			{
 				return;
 			}
-			_workState = WorkState.Stopped;
+			WorkStatus = WorkState.Stopped;
 			_pcts.Cancel();
 			_illTimer.Stop();
 
@@ -283,12 +285,12 @@ namespace HospitalSimulator
 
 		private void Pause()
 		{
-			if (_workState != WorkState.Started)
+			if (WorkStatus != WorkState.Started)
 			{
 				return;
 			}
 
-			_workState = WorkState.Paused;
+			WorkStatus = WorkState.Paused;
 			_pcts.Pause();
 			_illTimer.Stop();
 		}
@@ -320,7 +322,7 @@ namespace HospitalSimulator
 			Nobody
 		}
 
-		private enum WorkState
+		public enum WorkState
 		{
 			Started,
 			Stopped,

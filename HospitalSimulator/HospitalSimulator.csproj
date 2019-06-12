@@ -58,6 +58,7 @@
     <Compile Include="Converters\DoctorStatusConverter.cs" />
     <Compile Include="Converters\IllConverter.cs" />
     <Compile Include="Converters\SexConverter.cs" />
+    <Compile Include="Converters\WorkStatusConverter.cs" />
     <Compile Include="ExtButton.cs" />
     <Compile Include="TPLAdvanced\PauseOrCancelToken.cs" />
     <Compile Include="TPLAdvanced\PauseToken.cs" />
