@@ -4,27 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
-namespace HospitalSimulator
+namespace HospitalSimulator.ExtensionAnimationButtonColor
 {
 	public class ExtButton
 	{
-		public static readonly DependencyProperty TextProperty;
+		public static readonly DependencyProperty SizeProperty;
 
 		static ExtButton()
 		{
 			var metadata = new FrameworkPropertyMetadata(null);
-			TextProperty =  DependencyProperty.RegisterAttached("Text", typeof(String), typeof(ExtButton), null);
+			SizeProperty = DependencyProperty.RegisterAttached("Size", typeof(int), typeof(ExtButton), metadata);
 		}
 
-		public static String GetIcon(DependencyObject obj)
+		public static int GetSize(DependencyObject obj)
 		{
-			return (String)obj.GetValue(TextProperty);
+			return (int)obj.GetValue(SizeProperty);
 		}
 
-		public static void SetValue(DependencyObject obj, String value)
+		public static void SetSize(DependencyObject obj, int value)
 		{
-			obj.SetValue(TextProperty, value);
+			obj.SetValue(SizeProperty, value);
 		}
 	}
 }
